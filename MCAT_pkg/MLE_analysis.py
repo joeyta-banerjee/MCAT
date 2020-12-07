@@ -3,16 +3,17 @@ import pandas as pd
 import scipy
 import scipy.stats as st
 
-def log_like_iid_gamma_log_params(params, n):
+
+def log_like_iid_gamma_params(params, n):
     """Log likelihood for i.i.d. Gamma measurements with
-    input being logarithm of parameters.
+    input being parameters.
 
     Parameters
     ----------
-    log_params : array
-        Logarithm of the parameters alpha and b.
+    params : array
+        parameters alpha and b.
     n : array
-        Array of counts.
+        Array of input data
 
     Returns
     -------
@@ -46,6 +47,20 @@ def gen_gamma(alpha, b, size):
     return rg.gamma(alpha, 1 / b, size=size)
 
 def log_like(t, b_1, delta_b):
+    """Log likelihood for exponential distribution
+
+    Parameters
+    __________
+    t : array
+    data array
+    b_1 : parameter for first arrival time
+    delta_b : parameter for difference between two arrival times
+
+    Returns
+    __________
+    output : float
+        Log-likelihood.
+    """
     res = -b_1 * t + np.log(1 - np.exp(-delta_b*t)) + np.log(b_1 + delta_b) + np.log(b_1) - np.log(delta_b)
     return res
 vec_log_like = np.vectorize(log_like)
