@@ -1,9 +1,9 @@
 - dataset:
   storage: local
-  name: Sampling statistics from some fancy experiment
+  name: gardner_mt_catastrophe_only_tubulin 
   filetype: ".csv"
-  link: dataset1.csv
-  filesize: "24 MB"
+  link: gardner_mt_catastrophe_only_tubulin.csv
+  filesize: "11 KB"
 
 - dataset:
   storage: local
