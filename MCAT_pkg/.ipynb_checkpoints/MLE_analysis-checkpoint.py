@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
+import warnings
 import scipy
 import scipy.stats as st
 
 
-def log_like_iid_gamma_params(params, n):
+def log_like_iid_gamma_log_params(params, n):
     """Log likelihood for i.i.d. Gamma measurements with
     input being parameters.
 
