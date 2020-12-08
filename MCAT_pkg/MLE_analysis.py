@@ -90,7 +90,8 @@ def log_like_iid_exp_log_params(params, t):
     result = vec_log_like(t, b_1, delta_b)
     return np.sum(result)
 
-    def gen_exponential(b, delta_b, size):
+def gen_exponential(b, delta_b, size):
+    '''Generates exponential values given b and delta_b'''
     return (rg.exponential(1/b, size=size) + rg.exponential(1/(b + delta_b), size = size))
 
 def mle_iid_exp(n):
