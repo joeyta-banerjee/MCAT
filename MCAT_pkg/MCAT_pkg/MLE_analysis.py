@@ -73,7 +73,7 @@ def log_like_iid_exp_log_params(params, t):
     Parameters
     ----------
     params : array
-        Logarithm of the parameters beta and delta_beta
+        Parameters beta and delta_beta
     t : array
         Array of times.
 
@@ -95,16 +95,17 @@ def gen_exponential(b, delta_b, size):
     '''Generates exponential values given b and delta_b'''
     return (rg.exponential(1/b, size=size) + rg.exponential(1/(b + delta_b), size = size))
 
-def mle_iid_exp(n):
+def mle_iid_exp(t):
     """Perform maximum likelihood estimates for parameters for i.i.d.
-   exponentially distributed measurements, parametrized by beta, delta_beta"""
+   exponentially distributed measurements, parametrized by beta, beta_2"""
+    
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
         res = scipy.optimize.minimize(
-            fun=lambda params, n: -log_like_iid_exp_log_params(params, n),
+            fun=lambda params, t: -log_like_iid_exp_log_params(params, t),
             x0=np.array([1, 1]),
-            args=(n,),
+            args=(t,),
             method='Powell'
         )
     if res.success:

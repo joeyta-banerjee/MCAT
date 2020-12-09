@@ -45,7 +45,8 @@ def AIC(params, log_likelihood_fun, data):
     L = log_likelihood_fun(params, data);
     return -2*(L) + 2*len(params)
 
-def predictive_ecdf(data, gen_function, params, size = 1000, title = None):
+def predictive_ecdf(data, gen_function, params, size = 1000, title = None, xlabel = "Time to Catastrophe (s)", 
+                    color = "blue", data_color = "gray"):
     """ Compares ECDF of theoretical distribution to experimental
     Parameters
     __________
@@ -60,21 +61,22 @@ def predictive_ecdf(data, gen_function, params, size = 1000, title = None):
 
     size : int (optional), default = 1000
     number of samples to draw from the generative distribution
+    
+    palette : list (optional), default = ["blue"]
+    if given, used as palette argument to bebi103.viz.fill_between
     """
     single_samples = np.array([gen_function(*params, size = len(data))
                             for _ in range (size)])
     n_theor = np.arange(0, single_samples.max() + 1)
 
-    ecdfs = np.array([ecdf(n_theor, sample) for sample in single_samples])
-    ecdf_low, ecdf_high = np.percentile(ecdfs, [2.5, 97.5], axis=0)
-    p = bebi103.viz.fill_between(
-    x1=n_theor,
-    y1=ecdf_high,
-    x2=n_theor,
-    y2=ecdf_low,
-    patch_kwargs={"fill_alpha": 0.5},
-    x_axis_label="n",
-    y_axis_label="ECDF"
+    p = bebi103.viz.predictive_ecdf(
+    samples = single_samples,
+    data = data,
+    discrete = True,
+    color = color,
+    data_color=data_color,
+    x_axis_label=xlabel,
+    y_axis_label="ECDF",
     )
     if(title != None):
         p.title.text = title
@@ -82,7 +84,7 @@ def predictive_ecdf(data, gen_function, params, size = 1000, title = None):
 
 
 
-def QQ_plot(data, gen_function, params, size = 1000, axis_label = None, title = None):
+def QQ_plot(data, gen_function, params, size = 1000, axis_label = None, title = None, color = "green"):
     """ creates a QQ_plot comparing the empirical and theoretical value
 
     Parameters
@@ -105,6 +107,9 @@ def QQ_plot(data, gen_function, params, size = 1000, axis_label = None, title = 
 
     title : string (optional)
     if given, used as the title for the returned plot
+    
+    palette : list (optional)
+    if given, used as the argument to palette in bebi103.viz.qqplot
 
     Returns
     ________
@@ -115,6 +120,8 @@ def QQ_plot(data, gen_function, params, size = 1000, axis_label = None, title = 
     p = bebi103.viz.qqplot(
     data=data,
     samples=single_samples,
+    patch_kwargs = {"color":color},
+    line_kwargs = {"color":color}
     )
     if(axis_label != None):
         p.xaxis.axis_label = axis_label
