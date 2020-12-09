@@ -2,6 +2,8 @@ import numpy as np
 import iqplot
 import bokeh.io
 import bokeh
+import scipy
+import scipy.stats as st
 
 def __ecdf(x, data):
     """Give the value of an ECDF at arbitrary points x
@@ -49,21 +51,15 @@ def draw_bs_reps_test_stat(x, y, size=1):
 
 def __L(x, epsilon, data):
     '''Calculates L(x) for a given x value, epsilon, and data set'''
-    ecdf_vals = ecdf([x], data)
-    if (type(ecdf_vals) == np.array):
-        result = ecdf_vals[0]
-    else:
-        result = ecdf_vals[0]
-    return max(0, result - epsilon)
+    ecdf_vals = __ecdf(x, data)
+    
+    return [max(0, val - epsilon) for val in ecdf_vals]
 
 def __U(x, epsilon, data):
     '''Calculates U(x) for a given x value, epsilon, and data set'''
-    ecdf_vals = ecdf([x], data)
-    if (type(ecdf_vals) == np.array):
-        result = ecdf_vals[0]
-    else:
-        result = ecdf_vals[0]
-    return min(1, result + epsilon)
+    ecdf_vals = __ecdf(x, data)
+    
+    return [min(1, val + epsilon) for val in ecdf_vals]
 
 def plot_conf_int(data, title, xlabel, color = 'tomato'):
     ''' plots an ECDF with confidence intervals 
@@ -83,8 +79,8 @@ def plot_conf_int(data, title, xlabel, color = 'tomato'):
     epsilon = np.sqrt(np.log(2/0.05)/(2 * len(data)))
     p = bokeh.plotting.figure(title=title, x_axis_label=xlabel, 
                    y_axis_label='ECDF', width = 400, height = 400)
-    l = L(x, epsilon, data)
-    u = U(x, epsilon, data)
+    l = __L(x, epsilon, data)
+    u = __U(x, epsilon, data) 
     p.circle(x, l, color = color)
     p.circle(x, u, color = color)
     # overlay with experimental ECDF
