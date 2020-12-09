@@ -5,7 +5,7 @@ import os, sys
 import iqplot
 import bokeh.io
 
-def categorical_plot(df, variable, cats, format = "ECDF"):
+def categorical_plot(df, variable, cats, format = "ECDF", conf_int = False, palette = ["blue"]):
     ''' Plots the ECDF of times separated by concentration
 
     Parameters
@@ -22,6 +22,9 @@ def categorical_plot(df, variable, cats, format = "ECDF"):
     format : str (optional)
     type of graph to plot. options are ECDF, stripbox
     default : ECDF
+    
+    conf_int : bool (optional)
+    if given and plot type is ECDF, conf_int is the value for the conf_int keyword argument in iqplot
 
     Returns
     _________
@@ -30,8 +33,8 @@ def categorical_plot(df, variable, cats, format = "ECDF"):
     see figure
     '''
     if (format == "ECDF"):
-        p = iqplot.ecdf(df, q = variable, cats = cats)
+        p = iqplot.ecdf(df, q = variable, cats = cats, conf_int = conf_int, palette = palette)
     elif(format == "stripbox"):
-        p = iqplot.stripbox(df, q = variable, cats = cats)
+        p = iqplot.stripbox(df, q = variable, cats = cats, palette = palette)
     p.title.text = format + " of " + variable + " separated by " + cats
     return p

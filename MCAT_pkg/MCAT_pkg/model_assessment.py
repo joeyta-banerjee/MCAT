@@ -43,7 +43,7 @@ def AIC(params, log_likelihood_fun, data):
     """
 
     L = log_likelihood_fun(params, data);
-    return -2*(L - len(params))
+    return -2*(L) + 2*len(params)
 
 def predictive_ecdf(data, gen_function, params, size = 1000, title = None):
     """ Compares ECDF of theoretical distribution to experimental

@@ -1,0 +1,1 @@
+This package contains all the analysis necessary for our microtubule catastrophe website. We have also created twoo python notebook tutorials that walk through our data analysis using the functions contained in this package. 
