@@ -5,16 +5,16 @@ import scipy
 import scipy.stats as st
 
 
-def log_like_iid_gamma_log_params(params, n):
+def log_like_iid_gamma_log_params(params, t):
     """Log likelihood for i.i.d. Gamma measurements with
-    input being parameters.
+    input being parameters and data 
 
     Parameters
     ----------
     params : array
         parameters alpha and b.
-    n : array
-        Array of input data
+    t : array
+        Array of input data (times)
 
     Returns
     -------
@@ -24,19 +24,32 @@ def log_like_iid_gamma_log_params(params, n):
     alpha, b = params
     if(alpha <= 0 or b <= 0):
         return -np.inf
-    return np.sum(st.gamma.logpdf(n, alpha, scale = 1/b))
+    return np.sum(st.gamma.logpdf(t, alpha, scale = 1/b))
 
 rg = np.random.default_rng(3252)
-def mle_iid_gamma(n):
+def mle_iid_gamma(t):
     """Perform maximum likelihood estimates for parameters for i.i.d.
-    gamma measurements, parametrized by alpha, b=1/beta"""
+    gamma measurements, parametrized by alpha, b=1/beta
+    
+    Parameters
+    __________
+    t : array
+        data array
+
+    Returns
+    __________
+    output : tuple
+        Parameter estimates for alpha and beta
+    
+    
+    """
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
         res = scipy.optimize.minimize(
-            fun=lambda params, n: -log_like_iid_gamma_log_params(params, n),
+            fun=lambda params, t: -log_like_iid_gamma_log_params(params, t),
             x0=np.array([3, 3]),
-            args=(n,),
+            args=(t,),
             method='Powell'
         )
     if res.success:
@@ -45,6 +58,22 @@ def mle_iid_gamma(n):
         raise RuntimeError('Convergence failed with message', res.message)
 
 def gen_gamma(alpha, b, size):
+    """
+    Parameters
+    __________
+    alpha : float
+        parameter value for alpha
+    
+    b : float
+        parameter value for b = 1/beta
+    
+    size : int 
+        number of points to sample from the distribution
+    
+    Returns
+    __________
+    output : array
+        distribution based on input parameters"""
     return rg.gamma(alpha, 1 / b, size=size)
 
 def log_like(t, b_1, delta_b):
@@ -53,9 +82,9 @@ def log_like(t, b_1, delta_b):
     Parameters
     __________
     t : array
-    data array
+        data array
     b_1 : parameter for first arrival time
-    delta_b : parameter for difference between two arrival times
+        delta_b : parameter for difference between two arrival times
 
     Returns
     __________
@@ -92,12 +121,35 @@ def log_like_iid_exp_log_params(params, t):
     return np.sum(result)
 
 def gen_exponential(b, delta_b, size):
-    '''Generates exponential values given b and delta_b'''
+    '''Generates exponential values given b and delta_b
+    Parameters
+    __________
+    b : float
+        parameter for first arrival time
+    delta_b : float 
+        parameter for difference between two arrival times
+
+    Returns
+    __________
+    output : float
+        Log-likelihood.
+    '''
     return (rg.exponential(1/b, size=size) + rg.exponential(1/(b + delta_b), size = size))
 
 def mle_iid_exp(t):
     """Perform maximum likelihood estimates for parameters for i.i.d.
-   exponentially distributed measurements, parametrized by beta, beta_2"""
+   exponentially distributed measurements, parametrized by beta, delta_beta
+   
+   Parameters
+   ___________
+   t : array
+       input array of times
+   
+   Returns
+   ___________
+   output : tuple
+       parameters
+   """
     
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")

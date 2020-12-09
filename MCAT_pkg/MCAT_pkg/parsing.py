@@ -6,7 +6,7 @@ def separate_categories(df, return_col = "time to catastrophe (s)"):
     ''' Separates fluorescent labeled and not labeled into
     two separate numpy arrays
 
-    Parameters:
+    Parameters
     _______
     df : pandas DataFrame
     contains a column called "labeled" with the fluorescence information,
@@ -16,7 +16,7 @@ def separate_categories(df, return_col = "time to catastrophe (s)"):
     the name of the column of the dataframe to return values from, defaults
     to "time to catastrophe (s)"
 
-    Returns:
+    Returns
     _______
     tuple containing separated data from the given column; fluorescent
     labeled first, then not labeled
@@ -28,13 +28,12 @@ def separate_categories(df, return_col = "time to catastrophe (s)"):
 def parse_df(filename):
     '''Parses microtubule catastrophe dataframe
 
-    Parameters:
+    Parameters
     ______
     filename : str
     the filename of the data as a csv to read from
 
-    Returns :
-
+    Returns 
     ______
     pandas DataFrame containing parsed data, with NaN values filtered out
     '''
