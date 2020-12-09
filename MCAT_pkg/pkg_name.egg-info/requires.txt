@@ -1,4 +1,0 @@
-numpy
-pandas
-bebi103
-bokeh>=1.4.0
