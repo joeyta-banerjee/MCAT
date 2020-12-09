@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import warnings
 import scipy
+import iqplot
 import scipy.stats as st
 
 
@@ -164,3 +165,79 @@ def mle_iid_exp(t):
         return res.x
     else:
         raise RuntimeError('Convergence failed with message', res.message)
+        
+def gamma_cdf(t, alpha, beta, loc = 0):
+    """Calculate the cdf for a gamma distribution
+    Parameters
+    _________
+    t : array
+        input array of points to calculate cdf for
+    alpha : float
+        alpha parameter
+    beta : float
+        1/b for gamma distribution
+    loc : float (optional), default = 0
+        center of distribution
+        
+    Returns
+    _________
+    output : array
+        cdf for each point in t
+    """
+   
+    cdf = st.gamma.cdf(t, alpha, loc=0, scale=1/beta)
+    return cdf
+
+def model_cdf(t, beta_1, delta_beta):
+    """calculates cdf for our custom exponential distribution
+    Parameters
+    _________
+    t : array
+        input array of points to calculate cdf for
+    beta_1 : float
+        parameter for first arrival time
+    beta_2 : float
+        parameter for second arrival time
+        
+    Returns
+    _________
+    output : array
+        cdf for each point in t
+    """
+    beta_2 = beta_1 + delta_beta
+    if np.isclose(beta_1, beta_2):
+        return st.gamma.cdf(2, loc=0, scale=1 / beta_1)
+
+    cdf = (1 - np.exp(-beta_1 * t)) / beta_1 - (1 - np.exp(-beta_2 * t)) / beta_2
+
+    return beta_1 * beta_2 * cdf / (beta_2 - beta_1)
+
+def overlay_models(data, q, mle_params, cdf_fun = gamma_cdf, exp_color = 'green', theor_color = 'gray'):
+    """plots a comparison between experimental ECDF and theoretical
+    Parameters
+    _________
+    data : array
+        input data array 
+    q : string
+        quantiative axis label for plot
+    mle_params : tuple
+        parameter estimates to be used for given model
+    cdf_fun : function (optional), default = gamma_cdf
+        function to use to calculate CDFs
+    exp_color : string (optional), default = 'green'
+        color to use for experimental ECDF
+    theor_color : string (optional), default = 'gray'
+        color to use for theoretical CDF using our model
+        
+    Returns
+    _________
+    output : bokeh figure
+        figure containing the ECDFs overlaid
+    """
+    
+    p = iqplot.ecdf(data, q=q, conf_int=True, palette = [exp_color])
+
+    t_theor = np.linspace(0, 2000, 200)
+    cdf = cdf_fun(t_theor, *mle_params)
+    p.line(t_theor, cdf, line_width=1, color= theor_color)
+    return p

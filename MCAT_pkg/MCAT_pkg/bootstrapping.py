@@ -3,6 +3,7 @@ import iqplot
 import bokeh.io
 import bokeh
 import scipy
+import bebi103
 import scipy.stats as st
 
 def __ecdf(x, data):
@@ -135,7 +136,7 @@ def __U(x, epsilon, data):
     
     return [min(1, val + epsilon) for val in ecdf_vals]
 
-def plot_conf_int(data, title, xlabel, color = 'tomato'):
+def plot_conf_int(data, title, xlabel, color = 'green', palette = ["limegreen"]):
     ''' plots an ECDF with confidence intervals 
     data : array
         contains raw data points from experiment
@@ -156,8 +157,47 @@ def plot_conf_int(data, title, xlabel, color = 'tomato'):
                    y_axis_label='ECDF', width = 400, height = 400)
     l = __L(x, epsilon, data)
     u = __U(x, epsilon, data) 
-    p.circle(x, l, color = color)
-    p.circle(x, u, color = color)
+    p.line(x, l, color = color)
+    p.line(x, u, color = color)
     # overlay with experimental ECDF
-    iqplot.ecdf(data, p = p, conf_int = True)
+    iqplot.ecdf(data, p = p, conf_int = True, palette = palette)
+    return p
+
+def viz_compare_conf_int(data, data2, fun = np.mean, xlabel = "mean", title = "Comparison of Confidence Intervals",
+                         label1 = "sample1", label2 = "sample2", size = 1000, color = "dimgray"):
+    """Function to visualize overlap between two confidence intervals
+    Parameters
+    _________
+    
+    data : array
+        first dataset
+    data2 : array
+        second dataset
+    fun : statistical function (optional), default is mean
+        if given, statistical function to calculate for each dataset
+    label : string (optional), default is "mean"
+        if given, used as axis label for confidence intervals graph
+    size : int (optional), default = 1000
+        number of samples for each dataset
+    color : string (optional), default = "dimgray"
+        if given, color of intervals in visualization
+        
+    Returns
+    _________
+    output : bokeh figure containing the visualization
+        
+    """
+    bs_reps = draw_bs_reps(data, fun, size = size)
+    bs_reps2 = draw_bs_reps(data2, fun, size = size)
+    mean = np.mean(bs_reps)
+    mean2 = np.mean(bs_reps2)
+    conf_int = np.percentile(bs_reps, [2.5, 97.5])
+    conf_int2 = np.percentile(bs_reps2, [2.5, 97.5])
+    dict1 = {"estimate": mean, "conf_int": conf_int, "label" : label1}
+    dict2 = {"estimate":mean2, "conf_int":conf_int2, "label" : label2}
+    p = bebi103.viz.confints([dict1, dict2],  
+                             marker_kwargs = {"color":color},
+                            line_kwargs = {"color":color})
+    p.xaxis.axis_label = xlabel
+    p.title.text = title
     return p

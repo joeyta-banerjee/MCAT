@@ -38,7 +38,7 @@ def parse_df(filename):
     pandas DataFrame containing parsed data, with NaN values filtered out
     '''
     df_raw = pd.read_csv((filename), comment = "#")
-    df_parsed = pd.melt(df_raw, value_vars=list(df.columns.values),
+    df_parsed = pd.melt(df_raw, value_vars=list(df_raw.columns.values),
                     var_name = "Concentration (uM)",
                     value_name = "Time to catastrophe (s)")
     final_df = df_parsed.dropna()
